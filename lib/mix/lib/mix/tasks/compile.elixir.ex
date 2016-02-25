@@ -85,6 +85,11 @@ defmodule Mix.Tasks.Compile.Elixir do
     Mix.Compilers.Elixir.protocols_and_impls(manifest())
   end
 
+  @doc false
+  def stale_protocols(last_consolidated) do
+    Mix.Compilers.Elixir.stale_protocols(manifest(), last_consolidated)
+  end
+
   defp set_compiler_opts(project, opts, extra) do
     opts = Keyword.take(opts, Code.available_compiler_options)
     opts = Keyword.merge(project[:elixirc_options] || [], opts)

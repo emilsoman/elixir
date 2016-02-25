@@ -150,7 +150,10 @@ defmodule Mix.Tasks.Compile.Protocols do
           []
       end)
 
-    additions ++ removals
+    last_consolidated = Mix.Utils.last_modified(manifest)
+    stale = Mix.Tasks.Compile.Elixir.stale_protocols(last_consolidated)
+
+    additions ++ removals ++ stale
   end
 
   defp remove_consolidated(protocol, output) do

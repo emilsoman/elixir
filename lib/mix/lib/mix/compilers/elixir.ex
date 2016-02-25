@@ -92,6 +92,24 @@ defmodule Mix.Compilers.Elixir do
         do: {module, kind}
   end
 
+  @doc """
+  Returns stale protocols in the given manifest.
+  """
+  def stale_protocols(manifest, last_consolidated) do
+    all_entries = read_manifest(manifest)
+    all_mtimes = mtimes(all_entries)
+
+    for {_, module, kind, source, _, _, files, _} <- read_manifest(manifest),
+        protocol = match_protocol(module, kind),
+        times = Enum.map([source|files], &Map.fetch!(all_mtimes, &1)),
+        Mix.Utils.stale?(times, [last_consolidated]),
+        do: protocol
+  end
+
+  defp match_protocol(module, :protocol), do: module
+  defp match_protocol(_, {:impl, module}), do: module
+  defp match_protocol(_, _), do: false
+
   defp compile_manifest(manifest, entries, stale, dest, on_start) do
     Mix.Project.ensure_structure()
     true = Code.prepend_path(dest)
